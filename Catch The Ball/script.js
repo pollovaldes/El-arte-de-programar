@@ -52,6 +52,7 @@ function update() {
   ) {
     score++;
     resetBall();
+
     // Aumenta un poco la dificultad cada 5 puntos
     if (score % 5 === 0) ball.speed += 0.5;
   }
@@ -65,21 +66,29 @@ function update() {
   }
 }
 
-// 🔁 Reinicia la bola desde arriba
+// 🔁 Reinicia la bola desde arriba y cambia color
 function resetBall() {
   ball.x = Math.random() * (canvas.width - ball.radius * 2) + ball.radius;
   ball.y = 0;
+
+  // 🎨 Cambiar color aleatorio cada vez que reinicia
+  const colores = ["red", "blue", "green", "yellow", "orange", "purple", "cyan", "magenta"];
+  ball.color = colores[Math.floor(Math.random() * colores.length)];
 }
 
 // 🎨 Dibujar todo en pantalla
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Dibuja la bola
+  // Dibuja la bola con gradiente
   ctx.beginPath();
+  let gradient = ctx.createRadialGradient(ball.x, ball.y, 5, ball.x, ball.y, ball.radius);
+  gradient.addColorStop(0, "white");
+  gradient.addColorStop(1, ball.color);
+  ctx.fillStyle = gradient;
   ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-  ctx.fillStyle = ball.color;
   ctx.fill();
+  ctx.closePath();
 
   // Dibuja el catcher
   ctx.fillStyle = catcher.color;
@@ -99,27 +108,3 @@ function gameLoop() {
 }
 
 gameLoop();
-
-// 🌟 Mejora visual de la pelota (sin alterar el código original)
-const originalDraw = draw;
-draw = function() {
-  originalDraw();
-
-  // Añadir un brillo o textura sobre la pelota
-  ctx.beginPath();
-  let shine = ctx.createRadialGradient(ball.x - 5, ball.y - 5, 2, ball.x, ball.y, ball.radius);
-  shine.addColorStop(0, "rgba(255, 255, 255, 0.8)");
-  shine.addColorStop(1, "rgba(255, 255, 255, 0)");
-  ctx.fillStyle = shine;
-  ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.closePath();
-
-  // Añadir un borde sutil alrededor
-  ctx.beginPath();
-  ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
-  ctx.lineWidth = 2;
-  ctx.stroke();
-  ctx.closePath();
-};
