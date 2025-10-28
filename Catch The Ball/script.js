@@ -1,6 +1,6 @@
 // 🎮 Juego: Catch the Ball
-// Explicación: Mueves una barra con el mouse para atrapar una bola que cae.
-// Si la atrapas, ganas puntos. Si no, se reinicia el juego.
+// Explicación: Mueves una barra con el mouse para atrapar bolas que caen.
+// Si las atrapas, ganas puntos. Si no, se reinicia el juego.
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -9,10 +9,10 @@ const ctx = canvas.getContext("2d");
 canvas.width = 400;
 canvas.height = 600;
 
-// 🏀 Configuración inicial (ahora manejaremos múltiples bolas)
+// 🏀 Configuración inicial — ahora manejamos varias bolas normales
 let balls = [
   {
-    x: Math.random() * 380 + 10,
+    x: Math.random() * 380 + 10, // posición aleatoria inicial
     y: 0,
     radius: 15,
     speed: 3,
@@ -35,7 +35,7 @@ let special_ball = {
 let catcher = {
   width: 80,
   height: 10,
-  x: canvas.width / 2 - 40,
+  x: canvas.width / 2 - 40, // Centrado al inicio
   y: canvas.height - 40,
   color: "white",
 };
@@ -44,8 +44,8 @@ let score = 0;
 let mouseX = canvas.width / 2;
 
 // 🔊 Efectos de sonido
-const hitSound = new Audio("hit.mp3");
-const loseSound = new Audio("lose.mp3");
+const hitSound = new Audio("hit.mp3");   // cuando la bola toca la barra
+const loseSound = new Audio("lose.mp3"); // cuando el jugador pierde
 
 // 🖱 Evento: mover el mouse
 canvas.addEventListener("mousemove", (e) => {
@@ -55,13 +55,14 @@ canvas.addEventListener("mousemove", (e) => {
 
 // ⚙️ Actualizar posición y lógica
 function update() {
+  // Actualiza posición del catcher
   catcher.x = mouseX - catcher.width / 2;
 
-  // Mover todas las bolas normales
+  // 🏀 Mueve todas las bolas normales
   balls.forEach((ball) => {
     ball.y += ball.speed;
 
-    // 🧮 Colisión (bola vs catcher)
+    // 🧮 Detección de colisión (bola vs catcher)
     if (
       ball.y + ball.radius >= catcher.y &&
       ball.x >= catcher.x &&
@@ -72,21 +73,11 @@ function update() {
       hitSound.play();
       resetBall(ball);
 
+      // Aumenta dificultad cada 5 puntos
       if (score % 5 === 0) ball.speed += 0.5;
-
-      // 💥 NUEVO CAMBIO: cuando el score llega a 10, agregar otra bola
-      if (score === 10 && balls.length < 2) {
-        balls.push({
-          x: Math.random() * 380 + 10,
-          y: 0,
-          radius: 15,
-          speed: 3,
-          color: "yellow",
-        });
-      }
     }
 
-    // 🚫 Si una bola cae fuera del canvas
+    // 🚫 Si la bola cae fuera del canvas → perder
     if (ball.y > canvas.height) {
       loseSound.currentTime = 0;
       loseSound.play();
@@ -96,18 +87,31 @@ function update() {
     }
   });
 
-  // Lógica de la bola especial
+  // 💥 Nueva lógica: si el score llega a 10 y solo hay 1 bola, añade otra
+  if (score >= 10 && balls.length < 2) {
+    balls.push({
+      x: Math.random() * (canvas.width - 30) + 15,
+      y: 0,
+      radius: 15,
+      speed: 3,
+      color: "yellow",
+    });
+  }
+
+  // 🟡 special_ball solo se actualiza si está activa
   if (special_ball.active) {
     special_ball.y += special_ball.speed;
   } else {
+    // comprobar si es momento de reaparecer la bola especial
     if (Date.now() - special_ball.lastSpawn >= special_ball.spawnInterval) {
+      // activar y posicionar la bola especial
       reset_specialBall();
       special_ball.active = true;
       special_ball.lastSpawn = Date.now();
     }
   }
 
-  // Colisión con bola especial
+  // Colisión special_ball solo si está activa
   if (
     special_ball.active &&
     special_ball.y + special_ball.radius >= catcher.y &&
@@ -120,27 +124,31 @@ function update() {
     reset_specialBall();
   }
 
-  // Si la bola especial cae fuera
+  // Si la special_ball sale del canvas, desactivarla y reprogramar
   if (special_ball.active && special_ball.y > canvas.height) {
     special_ball.active = false;
     special_ball.lastSpawn = Date.now();
   }
 }
 
-// 🔁 Reinicia una bola desde arriba y cambia su color
+// 🔁 Reinicia una bola normal y cambia color
 function resetBall(ball) {
   ball.x = Math.random() * (canvas.width - ball.radius * 2) + ball.radius;
   ball.y = 0;
-  const colores = ["red", "blue", "green", "yellow", "orange", "purple", "cyan", "magenta"];
+
+  const colores = [
+    "red", "blue", "green", "yellow", "orange", "purple", "cyan", "magenta"
+  ];
   ball.color = colores[Math.floor(Math.random() * colores.length)];
 }
 
+// 🔁 Reinicia la bola especial
 function reset_specialBall() {
   special_ball.x = Math.random() * (canvas.width - special_ball.radius * 2) + special_ball.radius;
   special_ball.y = -special_ball.radius * 2;
 }
 
-// 🔁 Reinicia el juego completamente
+// 🔁 Reinicia todo el juego
 function resetGame() {
   balls = [
     {
@@ -155,11 +163,11 @@ function resetGame() {
   special_ball.lastSpawn = Date.now();
 }
 
-// 🎨 Dibujar todo
+// 🎨 Dibujar todo en pantalla
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Dibuja todas las bolas normales
+  // 🎨 Dibuja todas las bolas normales
   balls.forEach((ball) => {
     ctx.beginPath();
     let gradient = ctx.createRadialGradient(ball.x, ball.y, 5, ball.x, ball.y, ball.radius);
@@ -180,7 +188,7 @@ function draw() {
   ctx.font = "18px Arial";
   ctx.fillText("Score: " + score, 10, 25);
 
-  // Dibuja la bola especial
+  // Dibuja la bola especial solo si está activa
   if (special_ball.active) {
     draw_specialBall();
   }
@@ -212,11 +220,14 @@ function enableAudio() {
     loseSound.currentTime = 0;
   }).catch(() => {});
 
+  // arranca el juego
   gameLoop();
 
+  // quita los listeners
   window.removeEventListener("click", enableAudio);
   window.removeEventListener("keydown", enableAudio);
 }
 
+// Espera una interacción real del usuario
 window.addEventListener("click", enableAudio);
 window.addEventListener("keydown", enableAudio);
