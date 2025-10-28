@@ -1,6 +1,7 @@
 body {
   margin: 0;
-  background: #111;
+  background: url("fondo.jpg") no-repeat center center fixed;
+  background-size: cover; /* Hace que la imagen se ajuste a toda la pantalla */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -9,5 +10,6 @@ body {
 
 canvas {
   border: 2px solid #fff;
-  background: #000;
+  background: rgba(0, 0, 0, 0.8); /* Mantiene el canvas con fondo oscuro semitransparente */
 }
+
