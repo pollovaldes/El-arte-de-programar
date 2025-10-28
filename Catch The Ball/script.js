@@ -118,7 +118,7 @@ function draw() {
     const buttonW = 140;
     const buttonH = 40;
 
-    ctx.fillStyle = "#4b0082"; // morado brillante
+    ctx.fillStyle = "#4b0082"; // morado brillant
     ctx.fillRect(buttonX, buttonY, buttonW, buttonH);
     ctx.strokeStyle = "white";
     ctx.lineWidth = 2;
