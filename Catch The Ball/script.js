@@ -99,3 +99,27 @@ function gameLoop() {
 }
 
 gameLoop();
+
+// 🌟 Mejora visual de la pelota (sin alterar el código original)
+const originalDraw = draw;
+draw = function() {
+  originalDraw();
+
+  // Añadir un brillo o textura sobre la pelota
+  ctx.beginPath();
+  let shine = ctx.createRadialGradient(ball.x - 5, ball.y - 5, 2, ball.x, ball.y, ball.radius);
+  shine.addColorStop(0, "rgba(255, 255, 255, 0.8)");
+  shine.addColorStop(1, "rgba(255, 255, 255, 0)");
+  ctx.fillStyle = shine;
+  ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.closePath();
+
+  // Añadir un borde sutil alrededor
+  ctx.beginPath();
+  ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.closePath();
+};
