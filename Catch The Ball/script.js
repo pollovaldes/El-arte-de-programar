@@ -31,6 +31,18 @@ let special_ball = {
   lastSpawn: Date.now(),
 };
 
+let special_ball = {
+  x: Math.random() * 380 + 10,
+  y: 0,
+  radius: 8,
+  speed: 5,
+  color: "gold",
+  // added control properties:
+  active: false,                 // si la bola especial está visible/activa
+  spawnInterval: 10000,          // tiempo entre apariciones en ms (ej. 10000 = 10s)
+  lastSpawn: Date.now(),         // timestamp del último intento de spawn
+};
+
 // 🧍 Control del jugador (la barra)
 let catcher = {
   width: 80,
@@ -129,6 +141,12 @@ function update() {
     special_ball.active = false;
     special_ball.lastSpawn = Date.now();
   }
+
+  // Si la special_ball sale del canvas, desactivarla y programar reaparición
+  if (special_ball.active && special_ball.y > canvas.height) {
+    special_ball.active = false;
+    special_ball.lastSpawn = Date.now();
+  }
 }
 
 // 🔁 Reinicia una bola normal y cambia color
@@ -204,7 +222,7 @@ function draw_specialBall() {
 // 🌀 Bucle del juego
 function gameLoop() {
   update();
-  draw();
+  draw(); 
   requestAnimationFrame(gameLoop);
 }
 
