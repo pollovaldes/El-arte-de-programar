@@ -1,6 +1,6 @@
 // 🎮 Juego: Catch the Ball
-// Explicación: Mueves una barra con el mouse para atrapar una bola que cae.
-// Si la atrapas, ganas puntos. Si no, se reinicia el juego.
+// Explicación: Mueves una barra con el mouse para atrapar bolas que caen.
+// Si las atrapas, ganas puntos. Si no, se reinicia el juego.
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -9,20 +9,22 @@ const ctx = canvas.getContext("2d");
 canvas.width = 400;
 canvas.height = 600;
 
-// 🏀 Configuración de la bola
-let ball = {
-  x: Math.random() * 380 + 10, // Posición aleatoria inicial (evita los bordes)
-  y: 0,
-  radius: 15,
-  speed: 3,
-  color: "red",
-};
+// 🏀 Configuración inicial de bolas (ahora es un array)
+let balls = [
+  {
+    x: Math.random() * 380 + 10,
+    y: 0,
+    radius: 15,
+    speed: 3,
+    color: "red",
+  },
+];
 
 // 🧍 Control del jugador (la barra)
 let catcher = {
   width: 80,
   height: 10,
-  x: canvas.width / 2 - 40, // Centrado al inicio
+  x: canvas.width / 2 - 40,
   y: canvas.height - 40,
   color: "white",
 };
@@ -38,24 +40,25 @@ canvas.addEventListener("mousemove", (e) => {
 
 // ⚙️ Actualizar posición y lógica
 function update() {
-  // Mueve la bola
-  ball.y += ball.speed;
-
-  // Actualiza la posición del catcher
   catcher.x = mouseX - catcher.width / 2;
 
-  // 🧮 Detección de colisión (bola vs catcher)
-  if (
-    ball.y + ball.radius >= catcher.y &&
-    ball.x >= catcher.x &&
-    ball.x <= catcher.x + catcher.width
-  ) {
-    score++;
-    resetBall();
-    // Aumenta un poco la dificultad cada 5 puntos
-    if (score % 5 === 0) ball.speed += 0.5;
-     // 💥 NUEVO CAMBIO: cuando score llega a 10, agrega una bola nueva
-      if (score === 10) 
+  balls.forEach((ball) => {
+    ball.y += ball.speed;
+
+    // 🧮 Detección de colisión (bola vs catcher)
+    if (
+      ball.y + ball.radius >= catcher.y &&
+      ball.x >= catcher.x &&
+      ball.x <= catcher.x + catcher.width
+    ) {
+      score++;
+      resetBall(ball);
+
+      // Aumenta dificultad cada 5 puntos
+      if (score % 5 === 0) ball.speed += 0.5;
+
+      // 💥 NUEVO CAMBIO: cuando score llega a 10, agrega una bola nueva
+      if (score === 10) {
         balls.push({
           x: Math.random() * 380 + 10,
           y: 0,
@@ -63,19 +66,28 @@ function update() {
           speed: 3,
           color: "yellow",
         });
-  }
+      }
+    }
 
-  // 🚫 Si la bola cae fuera del canvas
-  if (ball.y > canvas.height) {
-    alert(`💀 Game Over! Score: ${score}`);
-    score = 0;
-    ball.speed = 3;
-    resetBall();
-  }
+    // 🚫 Si la bola cae fuera del canvas
+    if (ball.y > canvas.height) {
+      alert(`💀 Game Over! Score: ${score}`);
+      score = 0;
+      balls = [
+        {
+          x: Math.random() * 380 + 10,
+          y: 0,
+          radius: 15,
+          speed: 3,
+          color: "red",
+        },
+      ];
+    }
+  });
 }
 
-// 🔁 Reinicia la bola desde arriba
-function resetBall() {
+// 🔁 Reinicia una bola desde arriba
+function resetBall(ball) {
   ball.x = Math.random() * (canvas.width - ball.radius * 2) + ball.radius;
   ball.y = 0;
 }
@@ -84,11 +96,13 @@ function resetBall() {
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Dibuja la bola
-  ctx.beginPath();
-  ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-  ctx.fillStyle = ball.color;
-  ctx.fill();
+  // Dibuja todas las bolas
+  balls.forEach((ball) => {
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+    ctx.fillStyle = ball.color;
+    ctx.fill();
+  });
 
   // Dibuja el catcher
   ctx.fillStyle = catcher.color;
