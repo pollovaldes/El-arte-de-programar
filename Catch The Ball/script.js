@@ -30,6 +30,10 @@ let catcher = {
 let score = 0;
 let mouseX = canvas.width / 2;
 
+// 🔊 Efectos de sonido
+const hitSound = new Audio("hit.mp3");   // cuando la bola toca la barra
+const loseSound = new Audio("lose.mp3"); // cuando el jugador pierde
+
 // 🖱 Evento: mover el mouse
 canvas.addEventListener("mousemove", (e) => {
   const rect = canvas.getBoundingClientRect();
@@ -51,6 +55,8 @@ function update() {
     ball.x <= catcher.x + catcher.width
   ) {
     score++;
+    hitSound.currentTime = 0;
+    hitSound.play();
     resetBall();
     // Aumenta un poco la dificultad cada 5 puntos
     if (score % 5 === 0) ball.speed += 0.5;
@@ -58,6 +64,8 @@ function update() {
 
   // 🚫 Si la bola cae fuera del canvas
   if (ball.y > canvas.height) {
+    loseSound.currentTime = 0;
+    loseSound.play();
     alert(`💀 Game Over! Score: ${score}`);
     score = 0;
     ball.speed = 3;
@@ -98,4 +106,27 @@ function gameLoop() {
   requestAnimationFrame(gameLoop);
 }
 
-gameLoop();
+// 🔓 Desbloquear audio y empezar el juego
+function enableAudio() {
+  // intenta reproducir y pausar ambos para desbloquearlos
+  hitSound.play().then(() => {
+    hitSound.pause();
+    hitSound.currentTime = 0;
+  }).catch(() => {});
+  
+  loseSound.play().then(() => {
+    loseSound.pause();
+    loseSound.currentTime = 0;
+  }).catch(() => {});
+
+  // arranca el juego
+  gameLoop();
+
+  // quita el listener
+  window.removeEventListener("click", enableAudio);
+  window.removeEventListener("keydown", enableAudio);
+}
+
+// Espera una interacción real del usuario
+window.addEventListener("click", enableAudio);
+window.addEventListener("keydown", enableAudio);
