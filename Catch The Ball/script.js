@@ -83,6 +83,7 @@ function update() {
     hitSound.currentTime = 0;
     hitSound.play();
     resetBall();
+
     // Aumenta un poco la dificultad cada 5 puntos
     if (score % 5 === 0) ball.speed += 0.5;
   }
@@ -118,10 +119,14 @@ function update() {
   }
 }
 
-// 🔁 Reinicia la bola desde arriba
+// 🔁 Reinicia la bola desde arriba y cambia color
 function resetBall() {
   ball.x = Math.random() * (canvas.width - ball.radius * 2) + ball.radius;
   ball.y = 0;
+
+  // 🎨 Cambiar color aleatorio cada vez que reinicia
+  const colores = ["red", "blue", "green", "yellow", "orange", "purple", "cyan", "magenta"];
+  ball.color = colores[Math.floor(Math.random() * colores.length)];
 }
 
 function reset_specialBall() {
@@ -134,11 +139,15 @@ function reset_specialBall() {
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Dibuja la bola
+  // Dibuja la bola con gradiente
   ctx.beginPath();
+  let gradient = ctx.createRadialGradient(ball.x, ball.y, 5, ball.x, ball.y, ball.radius);
+  gradient.addColorStop(0, "white");
+  gradient.addColorStop(1, ball.color);
+  ctx.fillStyle = gradient;
   ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-  ctx.fillStyle = ball.color;
   ctx.fill();
+  ctx.closePath();
 
   // Dibuja el catcher
   ctx.fillStyle = catcher.color;
