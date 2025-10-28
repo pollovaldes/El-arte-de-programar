@@ -51,6 +51,11 @@ function update() {
     ball.x <= catcher.x + catcher.width
   ) {
     score++;
+
+    // 🎨 Cambiar color cada vez que haces un punto
+    const colores = ["red", "blue", "green", "yellow", "orange", "purple", "cyan", "magenta"];
+    ball.color = colores[Math.floor(Math.random() * colores.length)];
+
     resetBall();
 
     // Aumenta un poco la dificultad cada 5 puntos
@@ -66,14 +71,10 @@ function update() {
   }
 }
 
-// 🔁 Reinicia la bola desde arriba y cambia color
+// 🔁 Reinicia la bola desde arriba (solo posición)
 function resetBall() {
   ball.x = Math.random() * (canvas.width - ball.radius * 2) + ball.radius;
   ball.y = 0;
-
-  // 🎨 Cambiar color aleatorio cada vez que reinicia
-  const colores = ["red", "blue", "green", "yellow", "orange", "purple", "cyan", "magenta"];
-  ball.color = colores[Math.floor(Math.random() * colores.length)];
 }
 
 // 🎨 Dibujar todo en pantalla
